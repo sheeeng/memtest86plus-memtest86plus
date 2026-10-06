@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Copyright (C) 2004-2024 Sam Demeulemeester
+// Copyright (C) 2004-2026 Sam Demeulemeester
 //
 // ------------------------
 //
@@ -26,6 +26,8 @@
 
 #define MTL_MMR_IC_DECODE       0xD800
 #define MTL_MMR_CH0_DIMM_REG    0xD80C
+#define MTL_MMR_CH1_DIMM_REG    0xD810
+#define MTL_MAD_DIMM_SIZE_MASK  0x007F007F  // DIMM_S [22:16] | DIMM_L [6:0]
 
 #define MTL_MMR_CH0_PRE_REG     0xE000
 #define MTL_MMR_CH0_CAS_REG     0xE070
@@ -69,6 +71,13 @@ void get_imc_config_intel_mtl(void)
 
     offset = cha ? 0x0 : MTL_MMR_MC1_OFFSET;
     imc.width = (cha + chb) * 2;
+
+    // A single DIMM may be mapped to CH1 only
+    tmp = *(uint32_t*)(mchbar_addr + offset + MTL_MMR_CH0_DIMM_REG);
+    if (!(tmp & MTL_MAD_DIMM_SIZE_MASK)
+        && (*(uint32_t*)(mchbar_addr + offset + MTL_MMR_CH1_DIMM_REG) & MTL_MAD_DIMM_SIZE_MASK)) {
+        offset += MTL_MMR_CH1_OFFSET;
+    }
 
     // MTL+ only supports DDR5
     imc.type = "DDR5";
