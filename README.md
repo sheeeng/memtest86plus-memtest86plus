@@ -12,7 +12,7 @@ Memtest86+ can be loaded and run either directly by a PC BIOS (legacy or UEFI)
 or via an intermediate bootloader that supports the Linux 16-bit, 32-bit,
 64-bit, or EFI handover boot protocol. It should work on most x86, x86-64 CPU
  (Pentium class or later 32-bit or 64-bit), most ARMv8-A AArch64 CPU (UEFI
-boot only) and most LoongArch64 CPU (Loongson 3 and Loongson 2 family).
+and ACPI only) and most LoongArch64 CPU (Loongson 3 and Loongson 2 family).
 
 Binary releases (both stable and nightly dev builds) are available on
 [memtest.org](https://memtest.org).
@@ -228,6 +228,8 @@ recognised:
       * mmio16 = 16-bit MMIO
       * mmio32 = 32-bit MMIO
     * and *y* is the MMIO address in hex. with `0x` prefix (eg: 0xFEDC9000)
+  * console=ttyAMA,*x* (AArch64 only)
+    * activate a serial console on the UART at MMIO address *x*
   * newline
     * modifies the console to print a newline after every change to the frame buffer
       * useful in logging over serial where an escape or newline is needed
@@ -768,6 +770,24 @@ and [enhancement requests](https://github.com/memtest86plus/memtest86plus/discus
 on GitHub.
 
 Feel free to submit bug reports!
+
+### AArch64 Support Status
+
+AArch64 support is recent and has been validated on a limited number of
+platforms so far. Memtest86+ requires a UEFI firmware with ACPI support.
+
+Tested and working:
+
+  * Qualcomm Snapdragon X laptops (Microsoft Surface Laptop)
+  * Raspberry Pi 4 & 5 (with community UEFI firmware)
+  * QEMU virtual machines (`virt` machine with UEFI firmware)
+    * use `-M virt -cpu max -device ramfb -device qemu-xhci -device usb-kbd`
+      (virtio-gpu is not supported and leaves the screen blank)
+
+Not supported yet, or known limitations:
+
+  * No memory module (SPD), ECC or temperature information
+  * Apple Silicon Macs cannot run Memtest86+ natively
 
 ## Code Contributions
 
